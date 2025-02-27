@@ -1,3 +1,6 @@
+## Disclaimer
+This project is in active development and is not yet ready for deployment onto servers. This project is provided as is and will recieve various updates over the coming weeks. You have been warned! 
+
 ## Overview
 Sentry is a Discord bot designed to enhance the security of Discord servers by 
 automatically extracting and analyzing URLs sent in channels. This bot aims to 
