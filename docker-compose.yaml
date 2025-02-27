@@ -1,0 +1,8 @@
+services:
+  sentry:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sentry
+    restart: unless-stopped
+    command: ["python", "app/main.py"]
