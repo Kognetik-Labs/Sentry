@@ -14,9 +14,11 @@ class Settings(BaseSettings):
 
     # Define required environment variables and default values if applicable.
     DISCORD_SECRET: str = None
+    DISCORD_REACTION_SAFE: str = "�"  # Unicode Green Circle
+    DISCORD_REACTION_ERROR: str = "�"  # Unicode Orange Circle
+    DISCORD_LOGGING_CHANNEL_ID: int = None
+    DISCORD_LOGGING_EMBED_COLOR: str = "ED4337"
     VIRUSTOTAL_SECRET: str = None
-    CLOUDFLARE_SECRET: str = None
-    CLOUDFLARE_ACCOUNT: str = None
 
 
 @cache

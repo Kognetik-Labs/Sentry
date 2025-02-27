@@ -1,8 +1,8 @@
 import logging
 from typing import Optional
-from discord import Message, Intents, Client
+from discord import Message, Intents, Client, Embed, Color
 from settings import settings
-from urls import extract_urls, check_cloudflare, check_virustotal
+from urls import extract_urls, check_url
 
 # Define the intents for the bot.
 intents = Intents.default()
@@ -30,18 +30,33 @@ async def on_message(message: Message):
     if len(urls) < 1:
         return
 
-    # Determine if the link is malicious using various vendors.
-    virustotal: list[Optional[bool]] = [await check_virustotal(url) for url in urls]
-    cloudflare: list[Optional[bool]] = [await check_cloudflare(url) for url in urls]
+    # Determine if the link is malicious using VirusTotal.
+    results: list[Optional[bool]] = [await check_url(url) for url in urls]
 
     # Add the dangerous emoji to the message if any url is suspicious or malicious in the message content.
-    if any(virustotal) or any(cloudflare):
-        logger.warning("Found malicious links!")
+    if any(results):
+        # Remove the message.
         await message.delete()
+        logger.warning(f"Removed a malicious link. | {urls}")
+
+        # Ensure the logging channel exists.
+        channel = client.get_channel(settings().DISCORD_LOGGING_CHANNEL_ID)
+        if channel is None:
+            logger.warning("The Discord channel provided could not be found.")
+            return
+
+        # Send an embed if a logging channel exists.
+        r, g, b = tuple(int(settings().DISCORD_LOGGING_EMBED_COLOR[i:i+2], 16) for i in (0, 2, 4))
+        embed = Embed(
+            title="Removed Malicious URL",
+            description=f"Removed a malicious message from {message.author.mention} in {message.channel.mention}.",
+            color=Color.from_rgb(r, g, b)
+        )
+        await channel.send(embed=embed)
         return
 
     # Check if any urls failed to be scanned.
-    if None in virustotal or None in cloudflare:
+    if None in results:
         logger.info("Failed to determine if links are malicious!")
         await message.add_reaction(emoji="🟠")
         return
